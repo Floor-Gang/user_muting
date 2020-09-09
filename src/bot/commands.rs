@@ -9,7 +9,8 @@ use serenity::{
     },
     model::{
         channel::Message,
-        id::UserId
+        id::UserId,
+        id::RoleId
     }
 };
 use crate::bot::utils::{reply, filter_tag};
@@ -17,6 +18,7 @@ use crate::bot::DataBase;
 use crate::config::Config;
 use regex::Regex;
 use chrono::Duration;
+use std::sync::Arc;
 
 #[group()]
 #[commands(ping, db_test, prefix, mute)]
@@ -109,6 +111,11 @@ async fn mute(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
             }
         };
 
+        if member.roles.iter().any(|&role| role == RoleId::from(752779191690461215)) {
+            // Reply that user is already muted!
+            reply(&ctx, &msg, &String::from(format!("User <@{}> is already muted", uid))).await;
+            return Ok(());
+        }
 
         // Parse second argument
         let mut time = args.single::<String>().unwrap_or(String::from(""));
@@ -165,6 +172,30 @@ async fn mute(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
                 args.rewind();
             }
 
+            // Mute the user with given ID
+            if let Err(why) = guild.edit_member(&ctx.http, uid, |m|
+                m.roles(&vec![RoleId::from(752779191690461215)])).await {
+                println!("User was not muted because {}!", why);
+            }
+            else {
+                println!("user muted");
+
+                // If sleep count is provided, unmute user after the defined
+                // period.
+                if sleep_count.num_seconds() != 0 {
+                    let http = Arc::clone(&ctx.http);
+
+                    tokio::spawn(async move {
+                        tokio::time::delay_for(sleep_count.to_std().unwrap()).await;
+                        if let Err(why) = guild.edit_member(http, uid, |m|
+                            m.roles(&member.roles)).await {
+                                println!("User not unmuted because {}!", why);
+                            } else {
+                                println!("User unmuted!");
+                            }
+                    });
+                }
+            };
         }
 
         // Parse the input arguments to get the reason variable. If time is not
