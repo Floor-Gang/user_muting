@@ -1,7 +1,7 @@
 [package]
-name = "discord-bot-template"
+name = "user_muting"
 version = "0.1.0"
-authors = ["Matthew <staalkoper@gmail.com>"]
+authors = ["Sly"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -12,9 +12,11 @@ serde_yaml = "0.8.13"
 typemap = "0.3.3"
 time = { version = "0.1.35" }
 tokio-postgres = "0.5.5"
+regex = "1.3.9"
+chrono = "0.4"
 
 [dependencies.serenity]
-version = "0.9.0-rc.0"
+version = "0.9.0-rc.1"
 features = ["framework", "standard_framework", "rustls_backend", "cache", "collector"]
 
 [dependencies.tokio]

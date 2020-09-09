@@ -4,7 +4,7 @@ This template is configured with postgres and serenity.
 ## How to start
 Clone the repo with 
 ```bash
-git clone https://github.com/DankDumpster/rust-discord-bot-template
+git clone https://github.com/DankDumpster/rust-user_muting
 ```
 
 Build and run it for the first time
